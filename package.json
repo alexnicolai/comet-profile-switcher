@@ -1,0 +1,119 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "comet-profile-switcher",
+  "title": "Comet Profile Switcher",
+  "description": "Open any Comet browser profile from Raycast. Give each profile its own alias or hotkey.",
+  "icon": "icon.png",
+  "author": "alexnicolai",
+  "categories": [
+    "Applications",
+    "Productivity",
+    "Web"
+  ],
+  "license": "MIT",
+  "platforms": [
+    "macOS"
+  ],
+  "commands": [
+    {
+      "name": "switch-profile",
+      "title": "Switch Comet Profile",
+      "subtitle": "Comet",
+      "description": "Browse your Comet profiles and open one. Create a Quicklink for a profile to give it an alias or hotkey.",
+      "mode": "view",
+      "keywords": [
+        "comet",
+        "profile",
+        "browser",
+        "perplexity"
+      ]
+    },
+    {
+      "name": "open-profile",
+      "title": "Open Comet Profile",
+      "subtitle": "Comet",
+      "description": "Open a Comet profile by name, optionally with a URL. Used by Quicklinks for per-profile aliases and hotkeys.",
+      "mode": "no-view",
+      "keywords": [
+        "comet",
+        "profile",
+        "browser",
+        "perplexity"
+      ],
+      "arguments": [
+        {
+          "name": "profile",
+          "type": "text",
+          "placeholder": "Profile",
+          "required": false
+        },
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional)",
+          "required": false
+        }
+      ]
+    },
+    {
+      "name": "shortcuts",
+      "title": "Comet Profile Shortcuts",
+      "subtitle": "Comet",
+      "description": "See and manage the aliases, Quicklinks and hotkeys that open each Comet profile.",
+      "mode": "view",
+      "keywords": [
+        "comet",
+        "profile",
+        "alias",
+        "hotkey",
+        "shortcut",
+        "settings"
+      ]
+    }
+  ],
+  "preferences": [
+    {
+      "name": "cometApp",
+      "title": "Comet Application",
+      "description": "The Comet app to launch. Change this only if Comet is not in /Applications.",
+      "type": "appPicker",
+      "required": false,
+      "default": "ai.perplexity.comet"
+    },
+    {
+      "name": "userDataDir",
+      "title": "Comet Data Directory",
+      "description": "Where Comet keeps its profiles. Leave blank for the default location.",
+      "type": "directory",
+      "required": false,
+      "placeholder": "~/Library/Application Support/Comet"
+    },
+    {
+      "name": "alwaysNewWindow",
+      "title": "Windows",
+      "label": "Always open a new window",
+      "description": "By default Comet focuses an existing window for the profile if one is open. Enable this to open a fresh window every time.",
+      "type": "checkbox",
+      "required": false,
+      "default": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^2.4.1"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^2.0.4",
+    "@types/node": "^22.13.10",
+    "@types/react": "^19.0.10",
+    "eslint": "^9.22.0",
+    "prettier": "^3.5.3",
+    "typescript": "^5.8.2"
+  },
+  "scripts": {
+    "build": "ray build -e dist",
+    "dev": "ray develop",
+    "fix-lint": "ray lint --fix",
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish"
+  }
+}
