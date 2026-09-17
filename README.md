@@ -45,7 +45,9 @@ Copy it from the picker with ⌘C. When a deeplink is triggered from outside Ray
 
 - **Comet Application**: only needed if Comet isn't in `/Applications`.
 - **Comet Data Directory**: defaults to `~/Library/Application Support/Comet`. If you change it, also run the sync with `COMET_USER_DATA_DIR=/path npm run sync`.
-- **Always open a new window**: by default an existing window for the profile is focused; enable this to get a fresh window every time.
+- **Always open a new window**: by default an existing window for the profile is brought to the front; enable this to get a fresh window every time.
+
+Focusing an existing window uses macOS accessibility to find the Comet window titled with that profile, so Raycast needs **Accessibility** access (System Settings → Privacy & Security → Accessibility). Without it the extension still works but always opens a new window, and tells you why.
 
 ## Performance
 
@@ -57,11 +59,13 @@ Copy it from the picker with ⌘C. When a deeplink is triggered from outside Ray
 
 Comet is Chromium-based. Its profiles live in `~/Library/Application Support/Comet/<directory>` and are listed in `Local State` under `profile.info_cache`, with the display name and theme colors.
 
-`scripts/sync-profiles.mjs` reads that file and writes, for each profile, a command entry in `package.json`, a tiny `src/profile-<slug>.ts`, and an avatar icon in `assets/`. Opening a profile runs:
+`scripts/sync-profiles.mjs` reads that file and writes, for each profile, a command entry in `package.json`, a tiny `src/profile-<slug>.ts`, and an avatar icon in `assets/`. Opening a profile first looks for a Comet window whose title ends in ` - Comet - <profile>` and raises it. If there is none (or you asked for a new window / passed a URL), it runs:
 
 ```
 open -na /Applications/Comet.app --args --profile-directory="Profile 2" [--new-window] [url]
 ```
+
+A running Chromium always opens a new window for a bare `--profile-directory`, which is why the focus step comes first.
 
 Because the commands are generated from *your* profiles, this extension is meant to be installed from source rather than the Raycast Store (Store extensions have a fixed command list).
 

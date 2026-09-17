@@ -2,7 +2,7 @@ import { Cache, environment, getPreferenceValues, Application } from "@raycast/a
 import { execFile } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 export interface CometProfile {
   /** Directory name inside the user data dir, e.g. "Default" or "Profile 2". */
@@ -63,6 +63,10 @@ export function getAppPath(): string {
   const { cometApp } = getPreferenceValues<Preferences>();
   if (cometApp?.path && existsSync(cometApp.path)) return cometApp.path;
   return DEFAULT_APP_PATH;
+}
+
+export function alwaysNewWindow(): boolean {
+  return getPreferenceValues<Preferences>().alwaysNewWindow === true;
 }
 
 export function isCometInstalled(): boolean {
@@ -135,6 +139,62 @@ export function getProfiles(): CometProfile[] {
   }
 }
 
+/** App display name as it appears in window titles and the process list, e.g. "Comet". */
+function getAppName(): string {
+  return basename(getAppPath()).replace(/\.app$/, "");
+}
+
+export type FocusResult = "focused" | "none" | "not-running";
+
+// Chromium appends " - <App> - <Profile>" to window titles once more than one profile exists.
+// This raises the first window whose title carries the wanted profile and returns "focused".
+const FOCUS_SCRIPT = `on run argv
+  set appName to item 1 of argv
+  set suffix to item 2 of argv
+  tell application "System Events"
+    if not (exists process appName) then return "not-running"
+    tell process appName
+      repeat with w in windows
+        if suffix is "" or (name of w ends with suffix) then
+          try
+            if value of attribute "AXMinimized" of w is true then set value of attribute "AXMinimized" of w to false
+          end try
+          perform action "AXRaise" of w
+          set frontmost to true
+          return "focused"
+        end if
+      end repeat
+    end tell
+  end tell
+  return "none"
+end run`;
+
+/**
+ * Brings an already-open window of this profile to the front, if there is one.
+ * Requires Raycast to have Accessibility access; rejects with the osascript error otherwise.
+ */
+export function focusProfileWindow(profile: CometProfile, profileCount: number): Promise<FocusResult> {
+  const appName = getAppName();
+  // With a single profile Chromium omits the profile suffix, so any window will do.
+  const suffix = profileCount > 1 ? ` - ${appName} - ${profile.name}` : "";
+  return new Promise((resolve, reject) => {
+    execFile(
+      "/usr/bin/osascript",
+      ["-e", FOCUS_SCRIPT, appName, suffix],
+      { timeout: 5_000 },
+      (error, stdout, stderr) => {
+        if (error) reject(new Error(stderr?.trim() || error.message));
+        else resolve(stdout.trim() as FocusResult);
+      },
+    );
+  });
+}
+
+export function isAccessibilityError(error: unknown): boolean {
+  const msg = error instanceof Error ? error.message : String(error);
+  return /assistive access|-25211|-1719|not allowed/i.test(msg);
+}
+
 export interface LaunchOptions {
   url?: string;
   newWindow?: boolean;
@@ -150,12 +210,13 @@ function normalizeUrl(raw: string | undefined): string | undefined {
 /**
  * Launches Comet for the given profile. Uses `open -n` so macOS always spawns a fresh
  * launcher process; Chromium's singleton then hands the request to the running instance
- * (or becomes it) and focuses/opens a window for that profile. Nothing stays attached to Raycast.
+ * (or becomes it) and opens a window for that profile. Nothing stays attached to Raycast.
+ * Note: a running Chromium always opens a *new* window for a bare --profile-directory,
+ * so callers wanting to reuse a window call focusProfileWindow() first.
  */
 export function launchProfile(profile: CometProfile, options: LaunchOptions = {}): Promise<void> {
-  const { alwaysNewWindow } = getPreferenceValues<Preferences>();
   const args = ["-na", getAppPath(), "--args", `--profile-directory=${profile.directory}`];
-  if (options.newWindow || alwaysNewWindow) args.push("--new-window");
+  if (options.newWindow) args.push("--new-window");
   const url = normalizeUrl(options.url);
   if (url) args.push(url);
 
