@@ -4,7 +4,7 @@ A [Raycast](https://raycast.com) extension that opens a specific [Comet](https:/
 
 **Every Comet profile becomes its own Raycast command.** That means each profile shows up in Raycast Settings → Extensions with its own **Alias** and **Hotkey** fields, exactly like any other command. No Quicklinks, no indirection.
 
-![Profile commands in Raycast](metadata/comet-profile-switcher-2.png)
+![Each profile in Raycast Settings with its own alias and hotkey](metadata/comet-profile-switcher-2.png)
 
 ## Setup
 
