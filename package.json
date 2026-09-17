@@ -4,7 +4,7 @@
   "title": "Comet Profile Switcher",
   "description": "Open any Comet browser profile from Raycast. Assign profiles to commands and give each its own alias or hotkey.",
   "icon": "icon.png",
-  "author": "alexnicolai",
+  "author": "alexa",
   "categories": [
     "Applications",
     "Productivity",
