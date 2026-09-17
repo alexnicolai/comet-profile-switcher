@@ -1,31 +1,7 @@
-import {
-  Action,
-  ActionPanel,
-  closeMainWindow,
-  Color,
-  Icon,
-  Image,
-  Keyboard,
-  launchCommand,
-  LaunchType,
-  List,
-  open,
-  openExtensionPreferences,
-  showHUD,
-  showToast,
-  Toast,
-} from "@raycast/api";
-import { useCallback, useEffect, useState } from "react";
-import { AliasMap, getAliases } from "./aliases";
-import {
-  CometProfile,
-  getProfiles,
-  getUserDataDir,
-  isCometInstalled,
-  launchProfile,
-  profileDeeplink,
-  quicklinkName,
-} from "./comet";
+import { Action, ActionPanel, Color, Icon, Image, Keyboard, List, open, openExtensionPreferences } from "@raycast/api";
+import { useCallback, useState } from "react";
+import { CometProfile, getProfiles, getUserDataDir, isCometInstalled, profileDeeplink } from "./comet";
+import { openProfile } from "./launch";
 import { join } from "node:path";
 
 function profileIcon(profile: CometProfile): Image.ImageLike {
@@ -33,28 +9,10 @@ function profileIcon(profile: CometProfile): Image.ImageLike {
   return { source: Icon.PersonCircle, tintColor: profile.color ?? Color.PrimaryText };
 }
 
-async function openProfile(profile: CometProfile, newWindow = false) {
-  await closeMainWindow({ clearRootSearch: true });
-  try {
-    await launchProfile(profile, { newWindow });
-    await showHUD(`Opening Comet · ${profile.name}`);
-  } catch (error) {
-    await showToast({
-      style: Toast.Style.Failure,
-      title: "Couldn't open Comet",
-      message: error instanceof Error ? error.message : String(error),
-    });
-  }
-}
-
 export default function Command() {
   // getProfiles() is synchronous and cached, so the list renders fully on first paint.
   const [profiles, setProfiles] = useState<CometProfile[]>(getProfiles);
   const refresh = useCallback(() => setProfiles(getProfiles()), []);
-  const [aliases, setAliases] = useState<AliasMap>({});
-  useEffect(() => {
-    getAliases().then(setAliases);
-  }, []);
   const installed = isCometInstalled();
 
   if (!installed) {
@@ -89,8 +47,6 @@ export default function Command() {
       />
       {profiles.map((profile) => {
         const accessories: List.Item.Accessory[] = [];
-        const profileAliases = aliases[profile.directory] ?? [];
-        for (const alias of profileAliases) accessories.push({ tag: alias, tooltip: `Alias: ${alias}` });
         if (profile.active)
           accessories.push({ icon: { source: Icon.Dot, tintColor: Color.Green }, tooltip: "Window open" });
         if (profile.lastUsed) accessories.push({ tag: "Last used" });
@@ -101,7 +57,7 @@ export default function Command() {
             icon={profileIcon(profile)}
             title={profile.name}
             subtitle={profile.directory}
-            keywords={[profile.directory, ...profileAliases]}
+            keywords={[profile.directory]}
             accessories={accessories}
             actions={
               <ActionPanel>
@@ -111,26 +67,20 @@ export default function Command() {
                     title="Open in New Window"
                     icon={Icon.NewDocument}
                     shortcut={{ modifiers: ["cmd"], key: "return" }}
-                    onAction={() => openProfile(profile, true)}
+                    onAction={() => openProfile(profile, { newWindow: true })}
                   />
                 </ActionPanel.Section>
                 <ActionPanel.Section title="Alias & Hotkey">
-                  <Action.CreateQuicklink
-                    title="Create Quicklink for Profile"
-                    icon={Icon.Link}
-                    shortcut={{ modifiers: ["cmd"], key: "l" }}
-                    quicklink={{ name: quicklinkName(profile), link: profileDeeplink(profile) }}
+                  <Action
+                    title="Set Alias or Hotkey in Raycast Settings"
+                    icon={Icon.Keyboard}
+                    shortcut={Keyboard.Shortcut.Common.Edit}
+                    onAction={openExtensionPreferences}
                   />
                   <Action.CopyToClipboard
                     title="Copy Deeplink"
                     content={profileDeeplink(profile)}
                     shortcut={Keyboard.Shortcut.Common.Copy}
-                  />
-                  <Action
-                    title="Manage Shortcuts"
-                    icon={Icon.Keyboard}
-                    shortcut={Keyboard.Shortcut.Common.Duplicate}
-                    onAction={() => launchCommand({ name: "shortcuts", type: LaunchType.UserInitiated })}
                   />
                 </ActionPanel.Section>
                 <ActionPanel.Section>
@@ -146,7 +96,6 @@ export default function Command() {
                     shortcut={Keyboard.Shortcut.Common.Refresh}
                     onAction={refresh}
                   />
-                  <Action title="Open Extension Preferences" icon={Icon.Gear} onAction={openExtensionPreferences} />
                 </ActionPanel.Section>
               </ActionPanel>
             }

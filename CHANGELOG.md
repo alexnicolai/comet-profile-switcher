@@ -1,8 +1,7 @@
 # Comet Profile Switcher Changelog
 
-## [Initial Version] - 2026-09-16
+## [Initial Version] - 2026-09-17
 
-- **Switch Comet Profile**: list and open Comet profiles, with profile colors, open-window and last-used indicators.
-- **Open Comet Profile**: open a profile by alias, name or directory, optionally with a URL. Powers per-profile Quicklinks.
-- **Comet Profile Shortcuts**: settings view showing each profile's aliases, Quicklink and deeplink, with alias editing.
-- Create Quicklink and Copy Deeplink actions for every profile.
+- One generated command per Comet profile, so every profile gets its own alias and hotkey in Raycast Settings. Icons are drawn in each profile's Comet colors.
+- **Switch Comet Profile**: picker listing all profiles with open-window and last-used indicators, new-window action, and deeplink copying.
+- `npm run sync` (run automatically by `npm run dev` and `npm run build`) regenerates the commands from Comet's profile registry.

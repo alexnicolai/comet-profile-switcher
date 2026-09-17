@@ -1,5 +1,4 @@
 import { Cache, environment, getPreferenceValues, Application } from "@raycast/api";
-import type { AliasMap } from "./aliases";
 import { execFile } from "node:child_process";
 import { existsSync, readFileSync, statSync } from "node:fs";
 import { homedir } from "node:os";
@@ -136,30 +135,6 @@ export function getProfiles(): CometProfile[] {
   }
 }
 
-function normalize(s: string): string {
-  return s.trim().toLowerCase().replace(/\s+/g, " ");
-}
-
-/**
- * Resolve user input to a profile. Matches, in order: user alias, exact name, exact directory,
- * name prefix, name/directory substring. Case-insensitive.
- */
-export function findProfile(
-  query: string,
-  profiles: CometProfile[] = getProfiles(),
-  aliases: AliasMap = {},
-): CometProfile | undefined {
-  const q = normalize(query);
-  if (!q) return undefined;
-  return (
-    profiles.find((p) => aliases[p.directory]?.includes(q)) ??
-    profiles.find((p) => normalize(p.name) === q) ??
-    profiles.find((p) => normalize(p.directory) === q) ??
-    profiles.find((p) => normalize(p.name).startsWith(q)) ??
-    profiles.find((p) => normalize(p.name).includes(q) || normalize(p.directory).includes(q))
-  );
-}
-
 export interface LaunchOptions {
   url?: string;
   newWindow?: boolean;
@@ -198,12 +173,17 @@ export function commandDeeplink(command: string, args?: Record<string, string>):
   return args ? `${base}?arguments=${encodeURIComponent(JSON.stringify(args))}` : base;
 }
 
-/** Deeplink that runs the "Open Comet Profile" command for this profile. Usable as a Quicklink. */
-export function profileDeeplink(profile: CometProfile): string {
-  return commandDeeplink("open-profile", { profile: profile.directory });
+/** Name of the generated per-profile command (see scripts/sync-profiles.mjs; must match its slug rule). */
+export function profileCommandName(profile: CometProfile): string {
+  const slug =
+    profile.directory
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "profile";
+  return `profile-${slug}`;
 }
 
-/** The name the "Create Quicklink" action proposes for a profile. */
-export function quicklinkName(profile: CometProfile): string {
-  return `Comet · ${profile.name}`;
+/** Deeplink that opens this profile. Usable from Quicklinks, Shortcuts.app, a terminal, etc. */
+export function profileDeeplink(profile: CometProfile): string {
+  return commandDeeplink(profileCommandName(profile));
 }

@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "comet-profile-switcher",
   "title": "Comet Profile Switcher",
-  "description": "Open any Comet browser profile from Raycast. Give each profile its own alias or hotkey.",
+  "description": "Open any Comet browser profile from Raycast. Every profile becomes its own command, so it can have its own alias or hotkey.",
   "icon": "icon.png",
   "author": "alexnicolai",
   "categories": [
@@ -19,7 +19,7 @@
       "name": "switch-profile",
       "title": "Switch Comet Profile",
       "subtitle": "Comet",
-      "description": "Browse your Comet profiles and open one. Create a Quicklink for a profile to give it an alias or hotkey.",
+      "description": "Browse your Comet profiles and open one. Each profile also has its own command for aliases and hotkeys.",
       "mode": "view",
       "keywords": [
         "comet",
@@ -29,24 +29,18 @@
       ]
     },
     {
-      "name": "open-profile",
-      "title": "Open Comet Profile",
-      "subtitle": "Comet",
-      "description": "Open a Comet profile by name, optionally with a URL. Used by Quicklinks for per-profile aliases and hotkeys.",
+      "name": "profile-default",
+      "title": "netwatcher",
+      "subtitle": "Comet Profile",
+      "description": "Open the “netwatcher” Comet profile. Give it an alias or hotkey in Raycast Settings.",
+      "icon": "profile-default.png",
       "mode": "no-view",
       "keywords": [
         "comet",
         "profile",
-        "browser",
-        "perplexity"
+        "Default"
       ],
       "arguments": [
-        {
-          "name": "profile",
-          "type": "text",
-          "placeholder": "Profile",
-          "required": false
-        },
         {
           "name": "url",
           "type": "text",
@@ -56,18 +50,24 @@
       ]
     },
     {
-      "name": "shortcuts",
-      "title": "Comet Profile Shortcuts",
-      "subtitle": "Comet",
-      "description": "See and manage the aliases, Quicklinks and hotkeys that open each Comet profile.",
-      "mode": "view",
+      "name": "profile-profile-2",
+      "title": "Myria",
+      "subtitle": "Comet Profile",
+      "description": "Open the “Myria” Comet profile. Give it an alias or hotkey in Raycast Settings.",
+      "icon": "profile-profile-2.png",
+      "mode": "no-view",
       "keywords": [
         "comet",
         "profile",
-        "alias",
-        "hotkey",
-        "shortcut",
-        "settings"
+        "Profile 2"
+      ],
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional)",
+          "required": false
+        }
       ]
     }
   ],
@@ -110,10 +110,12 @@
     "typescript": "^5.8.2"
   },
   "scripts": {
+    "sync": "node scripts/sync-profiles.mjs",
+    "predev": "npm run sync",
+    "prebuild": "npm run sync",
     "build": "ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
-    "lint": "ray lint",
-    "publish": "npx @raycast/api@latest publish"
+    "lint": "ray lint"
   }
 }
