@@ -2,7 +2,7 @@
   "$schema": "https://www.raycast.com/schemas/extension.json",
   "name": "comet-profile-switcher",
   "title": "Comet Profile Switcher",
-  "description": "Open any Comet browser profile from Raycast. Every profile becomes its own command, so it can have its own alias or hotkey.",
+  "description": "Open any Comet browser profile from Raycast. Assign profiles to commands and give each its own alias or hotkey.",
   "icon": "icon.png",
   "author": "alexnicolai",
   "categories": [
@@ -19,7 +19,7 @@
       "name": "switch-profile",
       "title": "Switch Comet Profile",
       "subtitle": "Comet",
-      "description": "Browse your Comet profiles and open one. Each profile also has its own command for aliases and hotkeys.",
+      "description": "Browse your Comet profiles and open one. Focuses the profile's window if it is already open.",
       "mode": "view",
       "keywords": [
         "comet",
@@ -29,16 +29,15 @@
       ]
     },
     {
-      "name": "profile-default",
-      "title": "netwatcher",
-      "subtitle": "Comet Profile",
-      "description": "Open the “netwatcher” Comet profile. Give it an alias or hotkey in Raycast Settings.",
-      "icon": "profile-default.png",
+      "name": "slot-1",
+      "title": "Profile 1",
+      "subtitle": "Comet",
+      "description": "Opens the Comet profile you assign to this command. Give it an alias or hotkey so that profile is one keystroke away.",
       "mode": "no-view",
       "keywords": [
         "comet",
         "profile",
-        "Default"
+        "browser"
       ],
       "arguments": [
         {
@@ -47,19 +46,28 @@
           "placeholder": "URL (optional)",
           "required": false
         }
+      ],
+      "preferences": [
+        {
+          "name": "profile",
+          "title": "Comet Profile",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "Work",
+          "description": "The profile this command opens: its name as shown in Comet's profile menu (e.g. Work), or its folder name (e.g. Profile 2)."
+        }
       ]
     },
     {
-      "name": "profile-profile-2",
-      "title": "Myria",
-      "subtitle": "Comet Profile",
-      "description": "Open the “Myria” Comet profile. Give it an alias or hotkey in Raycast Settings.",
-      "icon": "profile-profile-2.png",
+      "name": "slot-2",
+      "title": "Profile 2",
+      "subtitle": "Comet",
+      "description": "Opens the Comet profile you assign to this command. Give it an alias or hotkey so that profile is one keystroke away.",
       "mode": "no-view",
       "keywords": [
         "comet",
         "profile",
-        "Profile 2"
+        "browser"
       ],
       "arguments": [
         {
@@ -67,6 +75,109 @@
           "type": "text",
           "placeholder": "URL (optional)",
           "required": false
+        }
+      ],
+      "preferences": [
+        {
+          "name": "profile",
+          "title": "Comet Profile",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "Work",
+          "description": "The profile this command opens: its name as shown in Comet's profile menu (e.g. Work), or its folder name (e.g. Profile 2)."
+        }
+      ]
+    },
+    {
+      "name": "slot-3",
+      "title": "Profile 3",
+      "subtitle": "Comet",
+      "description": "Opens the Comet profile you assign to this command. Give it an alias or hotkey so that profile is one keystroke away.",
+      "mode": "no-view",
+      "keywords": [
+        "comet",
+        "profile",
+        "browser"
+      ],
+      "disabledByDefault": true,
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional)",
+          "required": false
+        }
+      ],
+      "preferences": [
+        {
+          "name": "profile",
+          "title": "Comet Profile",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "Work",
+          "description": "The profile this command opens: its name as shown in Comet's profile menu (e.g. Work), or its folder name (e.g. Profile 2)."
+        }
+      ]
+    },
+    {
+      "name": "slot-4",
+      "title": "Profile 4",
+      "subtitle": "Comet",
+      "description": "Opens the Comet profile you assign to this command. Give it an alias or hotkey so that profile is one keystroke away.",
+      "mode": "no-view",
+      "keywords": [
+        "comet",
+        "profile",
+        "browser"
+      ],
+      "disabledByDefault": true,
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional)",
+          "required": false
+        }
+      ],
+      "preferences": [
+        {
+          "name": "profile",
+          "title": "Comet Profile",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "Work",
+          "description": "The profile this command opens: its name as shown in Comet's profile menu (e.g. Work), or its folder name (e.g. Profile 2)."
+        }
+      ]
+    },
+    {
+      "name": "slot-5",
+      "title": "Profile 5",
+      "subtitle": "Comet",
+      "description": "Opens the Comet profile you assign to this command. Give it an alias or hotkey so that profile is one keystroke away.",
+      "mode": "no-view",
+      "keywords": [
+        "comet",
+        "profile",
+        "browser"
+      ],
+      "disabledByDefault": true,
+      "arguments": [
+        {
+          "name": "url",
+          "type": "text",
+          "placeholder": "URL (optional)",
+          "required": false
+        }
+      ],
+      "preferences": [
+        {
+          "name": "profile",
+          "title": "Comet Profile",
+          "type": "textfield",
+          "required": true,
+          "placeholder": "Work",
+          "description": "The profile this command opens: its name as shown in Comet's profile menu (e.g. Work), or its folder name (e.g. Profile 2)."
         }
       ]
     }
@@ -110,12 +221,12 @@
     "typescript": "^5.8.2"
   },
   "scripts": {
-    "sync": "node scripts/sync-profiles.mjs",
-    "predev": "npm run sync",
-    "prebuild": "npm run sync",
     "build": "ray build -e dist",
     "dev": "ray develop",
     "fix-lint": "ray lint --fix",
-    "lint": "ray lint"
+    "lint": "ray lint",
+    "publish": "npx @raycast/api@latest publish",
+    "sync": "node scripts/sync-profiles.mjs",
+    "local": "node scripts/sync-profiles.mjs && cd .local && npx ray develop"
   }
 }

@@ -195,6 +195,25 @@ export function isAccessibilityError(error: unknown): boolean {
   return /assistive access|-25211|-1719|not allowed/i.test(msg);
 }
 
+function normalize(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/**
+ * Resolve user input to a profile. Matches, in order: exact name, exact directory,
+ * name prefix, name/directory substring. Case-insensitive.
+ */
+export function findProfile(query: string, profiles: CometProfile[]): CometProfile | undefined {
+  const q = normalize(query);
+  if (!q) return undefined;
+  return (
+    profiles.find((p) => normalize(p.name) === q) ??
+    profiles.find((p) => normalize(p.directory) === q) ??
+    profiles.find((p) => normalize(p.name).startsWith(q)) ??
+    profiles.find((p) => normalize(p.name).includes(q) || normalize(p.directory).includes(q))
+  );
+}
+
 export interface LaunchOptions {
   url?: string;
   newWindow?: boolean;

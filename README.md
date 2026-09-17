@@ -1,50 +1,28 @@
 # Comet Profile Switcher
 
-A [Raycast](https://raycast.com) extension that opens a specific [Comet](https://www.perplexity.ai/comet) browser profile instantly. Type `work` and hit Enter, or press a global hotkey, and Comet opens (or focuses) that profile.
+Open a specific [Comet](https://www.perplexity.ai/comet) browser profile straight from Raycast. Type `work` and hit Enter, or press a global hotkey, and Comet brings that profile's window to the front (or opens one).
 
-**Every Comet profile becomes its own Raycast command.** That means each profile shows up in Raycast Settings → Extensions with its own **Alias** and **Hotkey** fields, exactly like any other command. No Quicklinks, no indirection.
-
-![Each profile in Raycast Settings with its own alias and hotkey](metadata/comet-profile-switcher-2.png)
-
-## Setup
-
-```sh
-git clone https://github.com/alexnicolai/comet-profile-switcher
-cd comet-profile-switcher
-npm install
-npm run dev
-```
-
-`npm run dev` first reads your Comet profiles and generates one command per profile, then installs the extension into Raycast. Then:
-
-1. Open Raycast Settings → **Extensions** → **Comet Profile Switcher**.
-2. Next to each profile, set an **Alias** (e.g. `work`) and/or a **Hotkey** (e.g. Hyper + W).
-
-Added, removed or renamed a profile in Comet? Run `npm run dev` (or `npm run sync`) again and the commands update.
+![Switch Comet Profile](metadata/comet-profile-switcher-1.png)
 
 ## Commands
 
 | Command | What it does |
 | --- | --- |
-| **\<profile name\>** (one per profile) | Opens that profile, focusing its window if one is open. Accepts an optional URL argument: `Myria github.com`. Each has its own icon in the profile's Comet colors. |
-| **Switch Comet Profile** | A picker listing all profiles with a dot for open windows and a "Last used" tag. Enter opens, ⌘Enter opens a new window, ⌘E jumps to the alias/hotkey settings, ⌘C copies the profile's deeplink. |
+| **Switch Comet Profile** | Lists your Comet profiles with their colors, a dot for profiles that have a window open, and a "Last used" tag. Enter focuses or opens the profile. ⌘Enter opens a new window. |
+| **Profile 1** … **Profile 5** | Each opens the profile you assign to it. The first time you run one, Raycast asks which Comet profile it should open. Profiles 3 to 5 are off by default; enable them in Raycast Settings if you have more profiles. All accept an optional URL argument, e.g. `Profile 1 github.com`. |
 
-![Switch Comet Profile](metadata/comet-profile-switcher-1.png)
+## Give a profile an alias or hotkey
 
-## Deeplinks
+1. Run **Profile 1**. Raycast asks for the Comet profile: type its name exactly as Comet shows it (for example `Work`). The folder name such as `Profile 2` works too.
+2. Open Raycast Settings → **Extensions** → **Comet Profile Switcher**.
+3. Next to **Profile 1**, set an **Alias** (e.g. `work`) and/or a **Hotkey** (e.g. Hyper + W).
 
-Each profile command has a deeplink you can use from Shortcuts.app, Keyboard Maestro, BetterTouchTool or a terminal:
-
-```
-raycast://extensions/<you>/comet-profile-switcher/profile-profile-2
-```
-
-Copy it from the picker with ⌘C. When a deeplink is triggered from outside Raycast, Raycast asks for confirmation the first time; choose *Always Run Command*.
+Repeat with Profile 2 for your next profile, and so on. To change which profile a command opens, select it in Raycast, press ⌘K → *Configure Command*, or use ⌘E from the picker to jump to the settings.
 
 ## Preferences
 
 - **Comet Application**: only needed if Comet isn't in `/Applications`.
-- **Comet Data Directory**: defaults to `~/Library/Application Support/Comet`. If you change it, also run the sync with `COMET_USER_DATA_DIR=/path npm run sync`.
+- **Comet Data Directory**: defaults to `~/Library/Application Support/Comet`.
 - **Always open a new window**: by default an existing window for the profile is brought to the front; enable this to get a fresh window every time.
 
 Focusing an existing window uses macOS accessibility to find the Comet window titled with that profile, so Raycast needs **Accessibility** access (System Settings → Privacy & Security → Accessibility). Without it the extension still works but always opens a new window, and tells you why.
@@ -59,7 +37,7 @@ Focusing an existing window uses macOS accessibility to find the Comet window ti
 
 Comet is Chromium-based. Its profiles live in `~/Library/Application Support/Comet/<directory>` and are listed in `Local State` under `profile.info_cache`, with the display name and theme colors.
 
-`scripts/sync-profiles.mjs` reads that file and writes, for each profile, a command entry in `package.json`, a tiny `src/profile-<slug>.ts`, and an avatar icon in `assets/`. Opening a profile first looks for a Comet window whose title ends in ` - Comet - <profile>` and raises it. If there is none (or you asked for a new window / passed a URL), it runs:
+Opening a profile first looks for a Comet window whose title ends in ` - Comet - <profile>` and raises it. If there is none (or you asked for a new window / passed a URL), it runs:
 
 ```
 open -na /Applications/Comet.app --args --profile-directory="Profile 2" [--new-window] [url]
@@ -67,13 +45,24 @@ open -na /Applications/Comet.app --args --profile-directory="Profile 2" [--new-w
 
 A running Chromium always opens a new window for a bare `--profile-directory`, which is why the focus step comes first.
 
-Because the commands are generated from *your* profiles, this extension is meant to be installed from source rather than the Raycast Store (Store extensions have a fixed command list).
+## Local mode: one command per profile
+
+If you install from source, you can skip the slots entirely and get a command named after each of your profiles, with an icon in that profile's colors, so they appear by name in Raycast Settings:
+
+```sh
+git clone https://github.com/alexnicolai/comet-profile-switcher
+cd comet-profile-switcher
+npm install
+npm run local
+```
+
+This generates a private copy of the extension in `.local/` from your Comet profiles and installs it into Raycast as *Comet Profile Switcher (Local)*. Run `npm run local` again after adding or renaming profiles in Comet. The Store version can't do this because Store extensions have a fixed command list.
 
 ## Development
 
 ```sh
-npm run sync     # regenerate profile commands from Comet
-npm run dev      # sync + install into Raycast with hot reload
+npm install
+npm run dev      # install the Store version into Raycast with hot reload
 npm run lint
 npm run build
 ```

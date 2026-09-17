@@ -1,7 +1,7 @@
 # Comet Profile Switcher Changelog
 
-## [Initial Version] - 2026-09-17
+## [Initial Version] - {PR_MERGE_DATE}
 
-- One generated command per Comet profile, so every profile gets its own alias and hotkey in Raycast Settings. Icons are drawn in each profile's Comet colors.
-- **Switch Comet Profile**: picker listing all profiles with open-window and last-used indicators, new-window action, and deeplink copying.
-- `npm run sync` (run automatically by `npm run dev` and `npm run build`) regenerates the commands from Comet's profile registry.
+- **Switch Comet Profile**: pick a Comet profile from a list showing profile colors, open windows and the last-used profile. Focuses the profile's existing window, or opens one.
+- **Profile 1–5**: assignable commands, each opening the Comet profile you choose, so every profile can have its own alias and hotkey. Optional URL argument.
+- Local mode (`npm run local`) for source installs: one command per profile, named after it.
